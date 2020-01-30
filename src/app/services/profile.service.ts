@@ -1,32 +1,82 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {User} from  '../user';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
+  user: User
+  repos:any;
+  username = 'Wambuilucy';
+  searchname = "tetris";
 
-  private username: string;
-  private clientid = '469b9f611b8dc6b7204d';
-  private clientsecret =  '19366be1c273bf4a336355df2c125d8572e36f9c';
+  constructor(private http: HttpClient) { 
+    this.user = new User('',0,'');
+    this.http = http;
+    
+  }
 
-  constructor(private http: HttpClient) {
-    console.log('service is now ready!');
-    this.username = 'Mburiah';
-   }
-
-   getProfileInfo() {
-    return this.http.get('https://api.github.com/users/' + this.username + '?client_id=' + this.clientid +
-     '&client_secret=' + this.clientsecret);
+  getUsers(){
+    interface ApiResponse{
+      login:string;
+      id:number;
+      avatar_url:string;
     }
+    let  promise = new Promise((resolve, reject)=>{
+      return this.http.get<ApiResponse>('https://api.github.com/users/' + this.username).toPromise().then(response=>{
+        this.user.login = response.login
+        this.user.id = response.id
+        this.user.avatar_url = response.avatar_url
+        console.log(response)
 
-  getProfilerepos() {
-      return this.http.get('https://api.github.com/users/' + this.username + '/repos?client_id=' + this.clientid +
-       '&client_secret=' + this.clientsecret);
-      }
+        resolve(response)
+      },
+      error=>{
+        // this.user.name = "Cannot find name"
+        // this.user.login = "Cannot find login information" 
+        // this.user.repos = 0
 
-  updateProfile(username: string) {
-     this.username = username;
+
+        reject(error)
+
+      })
+    })
+    return promise
+  }
+  getRepos(){
+
+    let promise = new Promise((resolve, reject)=>{
+      return this.http.get("https://api.github.com/users/"+this.username+"/repos").toPromise().then(reply=>{
+        reply
+        resolve(reply)
+      },
+      error=>{
+        reject(error)
+      })
+    })
+    return promise
+  }
+
+  searchRepos(){
+    let promise = new Promise((resolve, reject)=>{
+      return this.http.get("https://api.github.com/search/repositories?q="+this.searchname+"").toPromise().then(replies=>{
+        resolve(replies)
+      },
+      error =>{
+        reject(error)
+      })
+    })
+    return promise
+  }
+
+  
+  updateName(userName:string){
+    this.username=userName;
+  }
+
+  updateRepoSearchName(Searchname:string){
+    this.searchname = Searchname;
   }
 }
