@@ -1,0 +1,14 @@
+.repo{
+    border: 2px solid black;
+    border-radius: 22px;
+    background-color: aliceblue;
+    margin: 3px;
+
+}
+
+p{
+    color: skyblue;
+    font-weight: 400;
+    font-size: 14px;
+}
+
